@@ -1,0 +1,32 @@
+import time
+import asyncio
+from board import srcp, udp
+from component.motor import motor
+from board import logger
+if __name__ == "__main__":
+    local = udp.YLX_UDP(('10.0.0.100', 8000))
+    boards = (True, True, False)
+    s0 = srcp.SRCP_Message(local, ('10.0.0.10', 8000))
+    as_y2 = motor(s0,3)
+    # 往左是False往右是True
+    for i in range (1000):
+        i=i+1;
+        print(i)
+        as_y2.StartMove(False)
+    # asyncio.run(as_y2.MotionReset())
+    # asyncio.run(as_y2.MotionMove(30))
+        time.sleep(7)
+        as_y2.StopMove()
+        time.sleep(0.4)
+        as_y2.StartMove(True)
+        time.sleep(7)
+        as_y2.StopMove()
+    # asyncio.run(as_y2.MotionMove(30))
+    # as_y2.StopMove()
+    # time.sleep(3)
+#可以移动
+#    as_y2.StartMove(True)
+#     # as_y2.MotionReset(True)
+#     # time.sleep(2)
+#     as_y2.MotionMove(10)
+#     time.sleep(1)
