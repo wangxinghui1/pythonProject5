@@ -1,0 +1,46 @@
+import time
+from board.tcpclient import tcpclient
+class nls_fm510_TCP:
+    def __init__(self,server:str,port:int):
+        self.Conn = tcpclient(server, port, self.__parse)
+
+    def Start(self):
+        if self.Conn is not None:
+            self.Conn.StartLC()
+
+    def Stop(self):
+        if self.Conn is not None:
+            self.Conn.StopLC()
+
+    def __parse(self, d: bytes):
+        print(d[7:].decode())
+
+    def SendCommand(self, data: bytes) -> int:
+        return self.Conn.SendLC(b'\x02' + data + b"\r\n")
+
+    def GetVersion(self) -> int:
+        return self.SendCommand(b"V")
+    def Reset(self)->int:
+        return self.SendCommand(b"H")
+    def Open(self) -> bool:
+        return self.SendCommand(b"CA+")
+
+    def Close(self) -> bool:
+        return self.SendCommand(b"CA-")
+
+# def Tuishou():
+
+if __name__ == "__main__":
+    scanner = nls_fm510_TCP("10.0.0.10", 8010)
+    scanner.Start()
+    time.sleep(2)
+    scanner.Open()
+    time.sleep(10)
+
+# 2 测试模块： response:
+# 00 测试推手- entrance推手 00 00 00 00 00 00 60 20 (推手为何与传统带状态一样?)
+# 01 入测传送带 + entrance传送带 00 01 00 00 00 00 60 20（跟方向有关，无论是否运动，状态查询返回一样）
+# 02 出样传送带3 - backexit传送带 00 02 00 00 00 00 60 00
+# 03 出测传送带 + testexit传送带 00 03 00 00 00 00 60 20
+# 04 出样传送带4 - backextrance传送带 00 04 00 00 00 00 60 00
+# 05 中途传送带 -      exit传送带    00 04 00 00 00 00 60 00
